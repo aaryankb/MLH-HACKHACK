@@ -246,14 +246,15 @@ In strict adherence to **Section 06 of the Student Rulebook**, the following AI 
 
 ---
 
-## 11. Screenshots & User Experience
+## 11. User Experience
 
-- **Apple Translate Style Upright UI:** Single-direction clean view with high-contrast cards.
+- ** Translate Style Upright UI:** Single-direction clean view with high-contrast cards.
 - **Physical Toggle Switch:** Effortlessly switch between `⚡ Local Edge Model (Gemma 4 E2B)` and `☁️ Cloud API (Gemma 4 Online)`.
 - **Live Latency & Engine Badge:** Instant visual confirmation of speed (e.g. `⚡ 120ms • Local Edge` or `⚡ 1.4s • Gemini Flash`).
 - **Interactive Agent Skill Inspector:** Tap the brain icon (`Psychology`) in the top app bar to view raw injected prompts, active domain matching, and glossary parameters in real-time.
 - **Persistent Model Cache:** Offline models download to `/sdcard/Download/hybrid_translator/` so weights persist across app builds and updates without re-downloading.
 
----
 
-*Built with passion at MIT Manipal for Hacktoberfest x MOSS Hack Day Udupi 2026.*
+
+HERE IS THE APK LINK FOR YOUR PHONE : https://drive.google.com/drive/folders/1PyQEIWtnwg-wCELZv2x446-eJKWtelMC
+---
