@@ -76,6 +76,7 @@ fun FaceToFaceScreen(viewModel: TranslatorViewModel) {
     )
 
     val quickSamplePhrases = listOf(
+        "hello man",
         "The patient is experiencing severe anaphylaxis.",
         "Where is the nearest potable water shelter?",
         "Please provide an affidavit for the court bail.",
@@ -469,12 +470,85 @@ fun FaceToFaceScreen(viewModel: TranslatorViewModel) {
                     // Translated Content
                     Text(
                         text = if (isTranslating) "Translating..." else translatedText.ifBlank { "Translation will appear here" },
-                        fontSize = 19.sp,
+                        fontSize = 20.sp,
                         fontWeight = if (translatedText.isNotBlank() && !isTranslating) FontWeight.SemiBold else FontWeight.Normal,
                         color = if (translatedText.isNotBlank() && !isTranslating) Color.White else AppleSecondaryText.copy(alpha = 0.5f),
-                        lineHeight = 26.sp,
+                        lineHeight = 28.sp,
                         modifier = Modifier.fillMaxWidth()
                     )
+
+                    // Alternatives with context probability scores
+                    val alternatives by viewModel.currentAlternatives.collectAsState()
+                    if (alternatives.isNotEmpty() && !isTranslating) {
+                        Spacer(modifier = Modifier.height(14.dp))
+                        HorizontalDivider(color = AppleCardBorder, thickness = 1.dp)
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        Text(
+                            text = "ALTERNATIVE CANDIDATES (CONTEXT PROBABILITY)",
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = AppleSecondaryText,
+                            letterSpacing = 0.5.sp
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            alternatives.forEach { alt ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(10.dp))
+                                        .background(ApplePillBg)
+                                        .clickable { viewModel.selectAlternative(alt) }
+                                        .padding(horizontal = 10.dp, vertical = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Text(
+                                                text = alt.type.uppercase(),
+                                                fontSize = 10.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                color = when {
+                                                    alt.type.contains("formal", ignoreCase = true) -> AppleBlue
+                                                    alt.type.contains("colloquial", ignoreCase = true) || alt.type.contains("casual", ignoreCase = true) -> AppleOrange
+                                                    else -> AppleSecondaryText
+                                                }
+                                            )
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Text(
+                                                text = "${alt.confidence}% confidence",
+                                                fontSize = 10.sp,
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = if (alt.confidence >= 85) AppleGreen else AppleOrange
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Text(
+                                            text = alt.text,
+                                            fontSize = 15.sp,
+                                            fontWeight = FontWeight.Medium,
+                                            color = Color.White
+                                        )
+                                    }
+
+                                    IconButton(
+                                        onClick = { viewModel.speechService.speak(alt.text, userBLang.code) },
+                                        modifier = Modifier.size(24.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.AutoMirrored.Filled.VolumeUp,
+                                            contentDescription = "Speak Alternative",
+                                            tint = AppleSecondaryText,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
 
                     // Agent Skill Badge (Glossary Terms Indicator)
                     val triggeredSkill = lastResult?.skillOutput

@@ -3,9 +3,16 @@ package com.moss.hybridtranslator.data.model
 import kotlinx.serialization.Serializable
 
 enum class Speaker {
-    USER_A, // Bottom user (e.g. Doctor, Aid Worker, Tourist)
-    USER_B  // Top user (rotated 180°, e.g. Patient, Local Resident)
+    USER_A, // Primary user (Doctor, Aid Worker, Traveler)
+    USER_B  // Partner user (Patient, Resident, Colleague)
 }
+
+@Serializable
+data class TranslationCandidate(
+    val text: String,
+    val type: String, // e.g. "Formal", "Colloquial / Casual", "Literal"
+    val confidence: Int // e.g. 95, 88, 72
+)
 
 @Serializable
 data class TranslationTurn(
@@ -15,6 +22,7 @@ data class TranslationTurn(
     val targetLanguage: String,
     val sourceText: String,
     val translatedText: String,
+    val alternatives: List<TranslationCandidate> = emptyList(),
     val isOffline: Boolean,
     val timestamp: Long = System.currentTimeMillis()
 )
@@ -36,10 +44,10 @@ data class SkillOutput(
 
 data class HarnessExecutionResult(
     val translatedText: String,
+    val alternatives: List<TranslationCandidate> = emptyList(),
     val isOffline: Boolean,
     val engineName: String,
     val skillOutput: SkillOutput,
     val injectedSystemPrompt: String,
     val executionLatencyMs: Long
 )
-

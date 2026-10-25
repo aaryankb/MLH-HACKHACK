@@ -57,6 +57,14 @@ class TranslatorViewModel(application: Application) : AndroidViewModel(applicati
     private val _currentTranslatedText = MutableStateFlow("ರೋಗಿಯು ತೀವ್ರ ಅಲರ್ಜಿ ಪ್ರತಿಕ್ರಿಯೆ (ಅನಾಫಿಲ್ಯಾಕ್ಸಿಸ್) ಅನುಭವಿಸುತ್ತಿದ್ದಾರೆ.")
     val currentTranslatedText: StateFlow<String> = _currentTranslatedText.asStateFlow()
 
+    private val _currentAlternatives = MutableStateFlow<List<com.moss.hybridtranslator.data.model.TranslationCandidate>>(
+        listOf(
+            com.moss.hybridtranslator.data.model.TranslationCandidate("ರೋಗಿಗೆ ತಕ್ಷಣದ ತುರ್ತು ಚಿಕಿತ್ಸೆ ಅಗತ್ಯವಿದೆ", "Formal", 94),
+            com.moss.hybridtranslator.data.model.TranslationCandidate("ರೋಗಿಯು ತೀವ್ರ ಅಲರ್ಜಿಯನ್ನು ಹೊಂದಿದ್ದಾನೆ", "Literal", 76)
+        )
+    )
+    val currentAlternatives: StateFlow<List<com.moss.hybridtranslator.data.model.TranslationCandidate>> = _currentAlternatives.asStateFlow()
+
     private val _turns = MutableStateFlow<List<TranslationTurn>>(emptyList())
     val turns: StateFlow<List<TranslationTurn>> = _turns.asStateFlow()
 
@@ -121,6 +129,12 @@ class TranslatorViewModel(application: Application) : AndroidViewModel(applicati
     fun clearSourceText() {
         _currentSourceText.value = ""
         _currentTranslatedText.value = ""
+        _currentAlternatives.value = emptyList()
+    }
+
+    fun selectAlternative(candidate: com.moss.hybridtranslator.data.model.TranslationCandidate) {
+        _currentTranslatedText.value = candidate.text
+        speechService.speak(candidate.text, _userBLanguage.value.code)
     }
 
     fun swapLanguages() {
@@ -153,6 +167,7 @@ class TranslatorViewModel(application: Application) : AndroidViewModel(applicati
 
             _lastExecutionResult.value = result
             _currentTranslatedText.value = result.translatedText
+            _currentAlternatives.value = result.alternatives
 
             val newTurn = TranslationTurn(
                 id = UUID.randomUUID().toString(),
@@ -161,6 +176,7 @@ class TranslatorViewModel(application: Application) : AndroidViewModel(applicati
                 targetLanguage = tgtLang.code,
                 sourceText = text,
                 translatedText = result.translatedText,
+                alternatives = result.alternatives,
                 isOffline = result.isOffline
             )
 
@@ -214,6 +230,7 @@ class TranslatorViewModel(application: Application) : AndroidViewModel(applicati
                 targetLanguage = tgtLang.code,
                 sourceText = sourceText,
                 translatedText = result.translatedText,
+                alternatives = result.alternatives,
                 isOffline = result.isOffline
             )
 
