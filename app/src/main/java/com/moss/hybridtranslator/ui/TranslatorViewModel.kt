@@ -82,7 +82,7 @@ class TranslatorViewModel(application: Application) : AndroidViewModel(applicati
     init {
         // Restore saved Gemini API key and model if previously configured
         val savedKey = prefs.getString("gemini_api_key", "").orEmpty()
-        val savedModel = prefs.getString("gemini_model_name", "gemma-4-it").orEmpty()
+        val savedModel = prefs.getString("gemini_model_name", "gemma-4-26b-a4b-it").orEmpty()
         if (savedKey.isNotBlank()) {
             geminiService.updateApiKey(savedKey, savedModel)
         }

@@ -233,6 +233,73 @@ fun FaceToFaceScreen(viewModel: TranslatorViewModel) {
                 )
             }
 
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // ==========================================
+            // TOGGLE SWITCH: LOCAL MODEL vs CLOUD API
+            // ==========================================
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(AppleCard)
+                    .border(
+                        1.dp,
+                        if (isOffline) AppleOrange.copy(alpha = 0.5f) else AppleBlue.copy(alpha = 0.5f),
+                        RoundedCornerShape(14.dp)
+                    )
+                    .padding(horizontal = 14.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(34.dp)
+                            .clip(CircleShape)
+                            .background(if (isOffline) Color(0xFF3B2500) else Color(0xFF0C2444)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = if (isOffline) Icons.Default.Bolt else Icons.Default.CloudQueue,
+                            contentDescription = null,
+                            tint = if (isOffline) AppleOrange else AppleBlue,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Column {
+                        Text(
+                            text = if (isOffline) "Local Edge Model (Gemma 4 E2B)" else "Cloud API (Gemma 4 Online)",
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                        Text(
+                            text = if (isOffline) "⚡ Ultra-fast • Zero network • Private" else "☁️ Full reasoning • Gemini API",
+                            fontSize = 11.sp,
+                            color = AppleSecondaryText
+                        )
+                    }
+                }
+
+                Switch(
+                    checked = isOffline, // Checked = Local Model (Offline Edge), Unchecked = Cloud API
+                    onCheckedChange = { isLocal ->
+                        viewModel.setOfflineMode(isLocal)
+                    },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = Color.White,
+                        checkedTrackColor = AppleOrange,
+                        uncheckedThumbColor = Color.White,
+                        uncheckedTrackColor = AppleBlue
+                    )
+                )
+            }
+
             Spacer(modifier = Modifier.height(12.dp))
 
             // ==========================================
@@ -763,6 +830,10 @@ fun FaceToFaceScreen(viewModel: TranslatorViewModel) {
     if (showDownload) {
         ModelDownloadDialog(
             mediaPipeService = viewModel.mediaPipeService,
+            onSwitchToLocal = {
+                viewModel.setOfflineMode(true)
+                Toast.makeText(context, "Switched to Local Edge Model for fastest response", Toast.LENGTH_SHORT).show()
+            },
             onDismiss = { viewModel.showDownloadDialog.value = false }
         )
     }

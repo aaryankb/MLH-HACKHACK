@@ -24,7 +24,7 @@ fun ApiKeyDialog(
     var apiKeyText by remember { mutableStateOf(initialKey) }
     var modelText by remember { mutableStateOf(initialModel) }
 
-    val presetModels = listOf("gemma-4-it", "gemini-1.5-flash", "gemini-2.0-flash", "gemma-2-9b-it")
+    val presetModels = listOf("gemma-4-26b-a4b-it", "gemini-3.5-flash", "gemini-flash-latest")
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
