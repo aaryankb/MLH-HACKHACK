@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.moss.hybridtranslator.harness.GlossaryLookupSkillTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-25T09:29:24" hostname="aaryankb19" time="0.035">
+<testsuite name="com.moss.hybridtranslator.harness.GlossaryLookupSkillTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-25T10:08:20" hostname="aaryankb19" time="0.038">
   <properties/>
-  <testcase name="testGeneralContextDoesNotTriggerFalsePositives" classname="com.moss.hybridtranslator.harness.GlossaryLookupSkillTest" time="0.032"/>
-  <testcase name="testMedicalDomainExtractionAndKannadaResolution" classname="com.moss.hybridtranslator.harness.GlossaryLookupSkillTest" time="0.002"/>
+  <testcase name="testGeneralContextDoesNotTriggerFalsePositives" classname="com.moss.hybridtranslator.harness.GlossaryLookupSkillTest" time="0.033"/>
+  <testcase name="testMedicalDomainExtractionAndKannadaResolution" classname="com.moss.hybridtranslator.harness.GlossaryLookupSkillTest" time="0.005"/>
   <testcase name="testDisasterReliefDomainExtractionAndHindiResolution" classname="com.moss.hybridtranslator.harness.GlossaryLookupSkillTest" time="0.0"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>

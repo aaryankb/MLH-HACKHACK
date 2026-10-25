@@ -1,19 +1,22 @@
 package com.moss.hybridtranslator.services
 
 import com.google.ai.client.generativeai.GenerativeModel
+import com.google.ai.client.generativeai.type.generationConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 /**
  * Cloud Translation Service targeting Google Gemma 4 via the Google Generative AI / Gemini API.
- * Meets requirements for the "Best Use of Gemma 4" hackathon challenge.
+ * Meets requirements for the "Best Use of Gemma 4" hackathon challenge while supporting
+ * Sub-Second Turbo Fast mode (gemini-3.5-flash) to solve high latency issues.
  */
 class GeminiGemmaService(
     private var apiKey: String = "",
-    private var modelName: String = "gemma-4-26b-a4b-it"
+    private var modelName: String = "gemini-3.5-flash"
 ) {
 
     private var generativeModel: GenerativeModel? = null
+    var isTurboMode: Boolean = true
 
     init {
         updateApiKey(apiKey, modelName)
@@ -21,8 +24,8 @@ class GeminiGemmaService(
 
     fun updateApiKey(newKey: String, newModelName: String = modelName) {
         this.apiKey = newKey.trim()
-        val cleanedModel = newModelName.trim().ifBlank { "gemma-4-26b-a4b-it" }
-        // Map legacy or failing aliases to active working Gemma 4 model
+        val cleanedModel = newModelName.trim().ifBlank { "gemini-3.5-flash" }
+        // Map legacy or failing aliases to active working models
         this.modelName = if (cleanedModel == "gemma-4-it" || cleanedModel == "gemma-4-31b-it") {
             "gemma-4-26b-a4b-it"
         } else {
@@ -31,9 +34,15 @@ class GeminiGemmaService(
 
         if (apiKey.isNotBlank()) {
             try {
+                val config = generationConfig {
+                    temperature = 0.1f
+                    topK = 20
+                    maxOutputTokens = 256
+                }
                 this.generativeModel = GenerativeModel(
                     modelName = this.modelName,
-                    apiKey = this.apiKey
+                    apiKey = this.apiKey,
+                    generationConfig = config
                 )
             } catch (e: Exception) {
                 this.generativeModel = null
@@ -57,21 +66,40 @@ class GeminiGemmaService(
             return@withContext "[Online Mode: No Gemini API Key configured. Tap the Settings icon in the center bar to enter your Gemini API key.]"
         }
 
-        // Ordered fallback cascade: User selected model -> Verified Gemma 4 -> Gemini 3.5 Flash
-        val modelCandidates = listOf(
-            modelName,
-            "gemma-4-26b-a4b-it",
-            "gemini-3.5-flash",
-            "gemini-flash-latest"
-        ).distinct()
+        // Ordered fallback cascade:
+        // When Turbo Mode is enabled -> Fast flash models (1-2s latency)
+        // When Turbo Mode is disabled -> Gemma 4 deep reasoning model
+        val modelCandidates = if (isTurboMode) {
+            listOf(
+                "gemini-3.5-flash",
+                "gemini-3.1-flash-lite-preview",
+                "gemini-flash-latest",
+                modelName,
+                "gemma-4-26b-a4b-it"
+            ).distinct()
+        } else {
+            listOf(
+                modelName,
+                "gemma-4-26b-a4b-it",
+                "gemini-3.5-flash",
+                "gemini-3.1-flash-lite-preview"
+            ).distinct()
+        }
 
         var lastException: Exception? = null
 
         for (candidate in modelCandidates) {
             try {
+                val config = generationConfig {
+                    temperature = 0.1f
+                    topK = 20
+                    maxOutputTokens = 256
+                }
+
                 val model = GenerativeModel(
                     modelName = candidate,
-                    apiKey = apiKey
+                    apiKey = apiKey,
+                    generationConfig = config
                 )
 
                 val response = model.generateContent(systemPrompt)

@@ -77,7 +77,7 @@ class ModelHarness(
                 fallbackGlossary = skillOutput.glossaryTerms
             )
         } else {
-            engineName = "Gemini API (Gemma 4 Cloud)"
+            engineName = if (geminiService.isTurboMode) "Gemini Flash (Turbo ⚡)" else "Gemma 4 Cloud (Reasoning 🧠)"
             rawResponse = geminiService.generateTranslation(
                 systemPrompt = systemPrompt,
                 userText = sourceText

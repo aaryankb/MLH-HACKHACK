@@ -51,6 +51,9 @@ class TranslatorViewModel(application: Application) : AndroidViewModel(applicati
     private val _isOfflineMode = MutableStateFlow(false)
     val isOfflineMode: StateFlow<Boolean> = _isOfflineMode.asStateFlow()
 
+    private val _isTurboMode = MutableStateFlow(true)
+    val isTurboMode: StateFlow<Boolean> = _isTurboMode.asStateFlow()
+
     private val _currentSourceText = MutableStateFlow("The patient is experiencing severe anaphylaxis.")
     val currentSourceText: StateFlow<String> = _currentSourceText.asStateFlow()
 
@@ -80,9 +83,12 @@ class TranslatorViewModel(application: Application) : AndroidViewModel(applicati
     val showApiKeyDialog = MutableStateFlow(false)
 
     init {
-        // Restore saved Gemini API key and model if previously configured
+        // Restore saved Gemini API key, model, and turbo speed mode
         val savedKey = prefs.getString("gemini_api_key", "").orEmpty()
-        val savedModel = prefs.getString("gemini_model_name", "gemma-4-26b-a4b-it").orEmpty()
+        val savedModel = prefs.getString("gemini_model_name", "gemini-3.5-flash").orEmpty()
+        val savedTurbo = prefs.getBoolean("is_turbo_mode", true)
+        _isTurboMode.value = savedTurbo
+        geminiService.isTurboMode = savedTurbo
         if (savedKey.isNotBlank()) {
             geminiService.updateApiKey(savedKey, savedModel)
         }
@@ -120,6 +126,19 @@ class TranslatorViewModel(application: Application) : AndroidViewModel(applicati
 
     fun setOfflineMode(offline: Boolean) {
         _isOfflineMode.value = offline
+    }
+
+    fun toggleTurboMode() {
+        val next = !_isTurboMode.value
+        _isTurboMode.value = next
+        geminiService.isTurboMode = next
+        prefs.edit().putBoolean("is_turbo_mode", next).apply()
+    }
+
+    fun setTurboMode(turbo: Boolean) {
+        _isTurboMode.value = turbo
+        geminiService.isTurboMode = turbo
+        prefs.edit().putBoolean("is_turbo_mode", turbo).apply()
     }
 
     fun updateSourceText(text: String) {

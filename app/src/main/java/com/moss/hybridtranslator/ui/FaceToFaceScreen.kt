@@ -52,6 +52,7 @@ fun FaceToFaceScreen(viewModel: TranslatorViewModel) {
     val userBLang by viewModel.userBLanguage.collectAsState()
     val contextSetter by viewModel.contextSetter.collectAsState()
     val isOffline by viewModel.isOfflineMode.collectAsState()
+    val isTurbo by viewModel.isTurboMode.collectAsState()
     val isTranslating by viewModel.isTranslating.collectAsState()
     val lastResult by viewModel.lastExecutionResult.collectAsState()
 
@@ -112,27 +113,47 @@ fun FaceToFaceScreen(viewModel: TranslatorViewModel) {
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(if (isOffline) Color(0xFF3B2500) else Color(0xFF0C2444))
-                            .clickable { viewModel.toggleOfflineMode() }
-                            .padding(horizontal = 8.dp, vertical = 2.dp)
-                    ) {
-                        Box(
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
-                                .size(6.dp)
-                                .clip(CircleShape)
-                                .background(if (isOffline) AppleOrange else AppleBlue)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = if (isOffline) "Offline: Gemma 4 E2B" else "Cloud: Gemma 4",
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = if (isOffline) AppleOrange else AppleBlue
-                        )
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(if (isOffline) Color(0xFF3B2500) else Color(0xFF0C2444))
+                                .clickable { viewModel.toggleOfflineMode() }
+                                .padding(horizontal = 8.dp, vertical = 2.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(6.dp)
+                                    .clip(CircleShape)
+                                    .background(if (isOffline) AppleOrange else AppleBlue)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = if (isOffline) "Offline: Gemma 4 E2B" else if (isTurbo) "Cloud: Turbo Flash (⚡ 1s)" else "Cloud: Gemma 4 (🧠 Deep)",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = if (isOffline) AppleOrange else AppleBlue
+                            )
+                        }
+
+                        if (!isOffline) {
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(if (isTurbo) AppleBlue.copy(alpha = 0.25f) else Color(0xFF2C2C2E))
+                                    .clickable { viewModel.toggleTurboMode() }
+                                    .padding(horizontal = 6.dp, vertical = 2.dp)
+                            ) {
+                                Text(
+                                    text = if (isTurbo) "⚡ Fast" else "🧠 Deep",
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (isTurbo) AppleBlue else Color.White
+                                )
+                            }
+                        }
                     }
                 }
 
@@ -273,13 +294,13 @@ fun FaceToFaceScreen(viewModel: TranslatorViewModel) {
                     Spacer(modifier = Modifier.width(10.dp))
                     Column {
                         Text(
-                            text = if (isOffline) "Local Edge Model (Gemma 4 E2B)" else "Cloud API (Gemma 4 Online)",
+                            text = if (isOffline) "Local Edge Model (Gemma 4 E2B)" else if (isTurbo) "Cloud API (Turbo Flash ⚡)" else "Cloud API (Gemma 4 Online)",
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
                         Text(
-                            text = if (isOffline) "⚡ Ultra-fast • Zero network • Private" else "☁️ Full reasoning • Gemini API",
+                            text = if (isOffline) "⚡ Ultra-fast • Zero network • Private" else if (isTurbo) "⚡ Sub-second response • Gemini Flash" else "☁️ Deep reasoning • Gemini API",
                             fontSize = 11.sp,
                             color = AppleSecondaryText
                         )
@@ -643,6 +664,33 @@ fun FaceToFaceScreen(viewModel: TranslatorViewModel) {
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Medium,
                                 color = AppleGreen
+                            )
+                        }
+                    }
+
+                    // Latency & Engine Performance Badge
+                    val curResult = lastResult
+                    if (curResult != null && !isTranslating) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(Color(0xFF2C2C2E).copy(alpha = 0.6f))
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                        ) {
+                            Icon(
+                                imageVector = if (curResult.isOffline) Icons.Default.Bolt else Icons.Default.Speed,
+                                contentDescription = null,
+                                tint = if (curResult.isOffline) AppleOrange else AppleBlue,
+                                modifier = Modifier.size(12.dp)
+                            )
+                            Spacer(modifier = Modifier.width(5.dp))
+                            Text(
+                                text = "${curResult.engineName} • ${curResult.executionLatencyMs}ms",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = AppleSecondaryText
                             )
                         }
                     }
