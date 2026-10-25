@@ -16,12 +16,15 @@ import androidx.compose.ui.window.Dialog
 
 @Composable
 fun ApiKeyDialog(
+    initialKey: String = "",
     initialModel: String,
     onSave: (apiKey: String, model: String) -> Unit,
     onDismiss: () -> Unit
 ) {
-    var apiKeyText by remember { mutableStateOf("") }
+    var apiKeyText by remember { mutableStateOf(initialKey) }
     var modelText by remember { mutableStateOf(initialModel) }
+
+    val presetModels = listOf("gemma-4-it", "gemini-1.5-flash", "gemini-2.0-flash", "gemma-2-9b-it")
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
@@ -89,7 +92,22 @@ fun ApiKeyDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    presetModels.forEach { preset ->
+                        FilterChip(
+                            selected = modelText.trim() == preset,
+                            onClick = { modelText = preset },
+                            label = { Text(preset, fontSize = 11.sp) }
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),

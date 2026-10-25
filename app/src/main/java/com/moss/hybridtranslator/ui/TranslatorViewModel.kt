@@ -30,6 +30,8 @@ val SUPPORTED_LANGUAGES = listOf(
 
 class TranslatorViewModel(application: Application) : AndroidViewModel(application) {
 
+    private val prefs = application.getSharedPreferences("hybrid_translator_prefs", Application.MODE_PRIVATE)
+
     private val glossarySkill = GlossaryLookupSkill(application)
     val geminiService = GeminiGemmaService()
     val mediaPipeService = MediaPipeGemmaService(application)
@@ -49,6 +51,12 @@ class TranslatorViewModel(application: Application) : AndroidViewModel(applicati
     private val _isOfflineMode = MutableStateFlow(false)
     val isOfflineMode: StateFlow<Boolean> = _isOfflineMode.asStateFlow()
 
+    private val _currentSourceText = MutableStateFlow("The patient is experiencing severe anaphylaxis.")
+    val currentSourceText: StateFlow<String> = _currentSourceText.asStateFlow()
+
+    private val _currentTranslatedText = MutableStateFlow("ರೋಗಿಯು ತೀವ್ರ ಅಲರ್ಜಿ ಪ್ರತಿಕ್ರಿಯೆ (ಅನಾಫಿಲ್ಯಾಕ್ಸಿಸ್) ಅನುಭವಿಸುತ್ತಿದ್ದಾರೆ.")
+    val currentTranslatedText: StateFlow<String> = _currentTranslatedText.asStateFlow()
+
     private val _turns = MutableStateFlow<List<TranslationTurn>>(emptyList())
     val turns: StateFlow<List<TranslationTurn>> = _turns.asStateFlow()
 
@@ -64,6 +72,13 @@ class TranslatorViewModel(application: Application) : AndroidViewModel(applicati
     val showApiKeyDialog = MutableStateFlow(false)
 
     init {
+        // Restore saved Gemini API key and model if previously configured
+        val savedKey = prefs.getString("gemini_api_key", "").orEmpty()
+        val savedModel = prefs.getString("gemini_model_name", "gemma-4-it").orEmpty()
+        if (savedKey.isNotBlank()) {
+            geminiService.updateApiKey(savedKey, savedModel)
+        }
+
         // Pre-populate with a demonstrative introductory turn
         viewModelScope.launch {
             val introTurn = TranslationTurn(
@@ -97,6 +112,76 @@ class TranslatorViewModel(application: Application) : AndroidViewModel(applicati
 
     fun setOfflineMode(offline: Boolean) {
         _isOfflineMode.value = offline
+    }
+
+    fun updateSourceText(text: String) {
+        _currentSourceText.value = text
+    }
+
+    fun clearSourceText() {
+        _currentSourceText.value = ""
+        _currentTranslatedText.value = ""
+    }
+
+    fun swapLanguages() {
+        val temp = _userALanguage.value
+        _userALanguage.value = _userBLanguage.value
+        _userBLanguage.value = temp
+
+        val tempText = _currentSourceText.value
+        _currentSourceText.value = _currentTranslatedText.value
+        _currentTranslatedText.value = tempText
+    }
+
+    fun translateCurrentText(autoSpeak: Boolean = false) {
+        val text = _currentSourceText.value.trim()
+        if (text.isBlank()) return
+
+        viewModelScope.launch {
+            _isTranslating.value = true
+            val srcLang = _userALanguage.value
+            val tgtLang = _userBLanguage.value
+
+            val result = harness.translate(
+                userContext = _contextSetter.value,
+                sourceText = text,
+                targetLanguageName = tgtLang.name,
+                targetLanguageCode = tgtLang.code,
+                isOfflineMode = _isOfflineMode.value,
+                history = _turns.value
+            )
+
+            _lastExecutionResult.value = result
+            _currentTranslatedText.value = result.translatedText
+
+            val newTurn = TranslationTurn(
+                id = UUID.randomUUID().toString(),
+                speaker = Speaker.USER_A,
+                sourceLanguage = srcLang.code,
+                targetLanguage = tgtLang.code,
+                sourceText = text,
+                translatedText = result.translatedText,
+                isOffline = result.isOffline
+            )
+
+            _turns.value = _turns.value + newTurn
+            _isTranslating.value = false
+
+            if (autoSpeak) {
+                speechService.speak(result.translatedText, tgtLang.code)
+            }
+        }
+    }
+
+    fun toggleSpeechRecognition() {
+        if (speechService.isListening.value) {
+            speechService.stopListening()
+        } else {
+            speechService.startListening(_userALanguage.value.code) { recognized ->
+                _currentSourceText.value = recognized
+                translateCurrentText(autoSpeak = true)
+            }
+        }
     }
 
     fun translateTurn(speaker: Speaker, sourceText: String) {
@@ -156,6 +241,10 @@ class TranslatorViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun saveApiKey(key: String, model: String) {
+        prefs.edit()
+            .putString("gemini_api_key", key.trim())
+            .putString("gemini_model_name", model.trim())
+            .apply()
         geminiService.updateApiKey(key, model)
     }
 

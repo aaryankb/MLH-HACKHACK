@@ -48,6 +48,14 @@ class MediaPipeGemmaService(private val context: Context? = null) {
 
     private fun initializeLlmInference(path: String) {
         if (context == null) return
+        val file = File(path)
+        // Guard: MediaPipe .task models are binary FlatBuffers of at least several hundred megabytes.
+        // If mock weights (<100MB) are present, avoid native parser crash and use deterministic edge fallback.
+        if (!file.exists() || file.length() < 100 * 1024 * 1024) {
+            llmInference = null
+            _isModelReady.value = file.exists()
+            return
+        }
         try {
             val options = LlmInference.LlmInferenceOptions.builder()
                 .setModelPath(path)

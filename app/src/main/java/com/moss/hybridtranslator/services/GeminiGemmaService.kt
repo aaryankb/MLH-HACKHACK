@@ -39,6 +39,8 @@ class GeminiGemmaService(
 
     fun isConfigured(): Boolean = apiKey.isNotBlank()
 
+    fun getApiKey(): String = apiKey
+
     fun getModelName(): String = modelName
 
     suspend fun generateTranslation(
@@ -46,7 +48,7 @@ class GeminiGemmaService(
         userText: String
     ): String = withContext(Dispatchers.IO) {
         if (!isConfigured()) {
-            return@withContext "[Online Mode: No Gemini API Key set in Settings. Please enter your Gemini API key to query $modelName.]"
+            return@withContext "[Online Mode: No Gemini API Key configured. Tap the Settings icon in the center bar to enter your Gemini API key.]"
         }
 
         try {
@@ -55,17 +57,26 @@ class GeminiGemmaService(
                 apiKey = apiKey
             ).also { generativeModel = it }
 
-            val response = model.generateContent(
-                """
-                $systemPrompt
-                """.trimIndent()
-            )
-
+            val response = model.generateContent(systemPrompt)
             response.text?.trim() ?: "[Translation returned empty]"
         } catch (e: Exception) {
-            // If the key doesn't have access to the specific gemma-4-it alias or runs into a quota error,
-            // provide a graceful informative message.
-            "[Gemini API ($modelName) Error: ${e.localizedMessage ?: e.message}]"
+            val errorMsg = e.localizedMessage ?: e.message ?: "Unknown error"
+            // If the key doesn't have access to the specific gemma-4-it alias, provide seamless fallback
+            if (errorMsg.contains("not found", ignoreCase = true) && modelName.startsWith("gemma-4")) {
+                try {
+                    val fallbackModel = GenerativeModel(
+                        modelName = "gemini-1.5-flash",
+                        apiKey = apiKey
+                    )
+                    val fallbackResp = fallbackModel.generateContent(systemPrompt)
+                    val text = fallbackResp.text?.trim() ?: "[Translation returned empty]"
+                    "$text\n\n[Gemma 4 notice: Fallback generated using gemini-1.5-flash because $modelName was not found on this API key tier]"
+                } catch (fallbackEx: Exception) {
+                    "[Gemini API ($modelName) Error: $errorMsg. Please check your API key in Settings.]"
+                }
+            } else {
+                "[Gemini API ($modelName) Error: $errorMsg]"
+            }
         }
     }
 }
