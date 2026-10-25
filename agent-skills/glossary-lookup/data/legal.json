@@ -1,0 +1,35 @@
+{
+  "domain": "legal",
+  "keywords": ["court", "police", "affidavit", "custody", "bail", "lawyer", "attorney", "rights", "witness", "testimony", "refugee", "asylum", "permit", "guardian"],
+  "terms": {
+    "affidavit": {
+      "kn": "ಪ್ರಮಾಣಪತ್ರ (ಅಫಿಡವಿಟ್)",
+      "hi": "शपथ पत्र (हलफनामा)",
+      "te": "ప్రమాణ పత్రం (అఫిడవిట్)",
+      "ta": "பிரமாண பத்திரம்",
+      "es": "declaración jurada / afidávit"
+    },
+    "bail": {
+      "kn": "ಜಾಮೀನು",
+      "hi": "जमानत",
+      "te": "బెయిలు (జామీను)",
+      "ta": "ஜாமீன்",
+      "es": "fianza / libertad bajo fianza"
+    },
+    "legal guardian": {
+      "kn": "ಕಾನೂನುಬದ್ಧ ಪಾಲಕರು / ಪೋಷಕರು",
+      "hi": "कानूनी अभिभावक",
+      "te": "చట్టపరమైన సంరక్షకుడు",
+      "ta": "சட்டப்பூர்வ பாதுகாவலர்",
+      "es": "tutor legal / custodio"
+    },
+    "refugee status": {
+      "kn": "ನಿರಾಶ್ರಿತರ ಸ್ಥಾನಮಾನ",
+      "hi": "शरणार्थी का दर्जा",
+      "te": "శరణార్థి హోదా",
+      "ta": "அகதி அந்தஸ்து",
+      "es": "estatus de refugiado"
+    }
+  }
+}
+

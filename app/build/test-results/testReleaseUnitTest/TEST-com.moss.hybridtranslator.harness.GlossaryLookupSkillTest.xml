@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.moss.hybridtranslator.harness.GlossaryLookupSkillTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-25T06:44:09" hostname="zenbook14" time="0.092">
+  <properties/>
+  <testcase name="testGeneralContextDoesNotTriggerFalsePositives" classname="com.moss.hybridtranslator.harness.GlossaryLookupSkillTest" time="0.082"/>
+  <testcase name="testMedicalDomainExtractionAndKannadaResolution" classname="com.moss.hybridtranslator.harness.GlossaryLookupSkillTest" time="0.007"/>
+  <testcase name="testDisasterReliefDomainExtractionAndHindiResolution" classname="com.moss.hybridtranslator.harness.GlossaryLookupSkillTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

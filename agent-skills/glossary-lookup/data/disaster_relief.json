@@ -1,0 +1,42 @@
+{
+  "domain": "disaster_relief",
+  "keywords": ["flood", "earthquake", "cyclone", "evacuation", "shelter", "rations", "potable water", "relief", "rescue", "camp", "supplies", "tsunami", "landslide", "missing"],
+  "terms": {
+    "potable water": {
+      "kn": "ಕುಡಿಯಲು ಯೋಗ್ಯವಾದ ಶುದ್ಧ ನೀರು",
+      "hi": "पीने योग्य स्वच्छ पानी",
+      "te": "త్రాగునీరు (రక్షిత నీరు)",
+      "ta": "குடிநீர்",
+      "es": "agua potable"
+    },
+    "evacuation center": {
+      "kn": "ಸ್ಥಳಾಂತರ ಕೇಂದ್ರ / ಪರಿಹಾರ ಶಿಬಿರ",
+      "hi": "निकासी केंद्र / राहत शिविर",
+      "te": "పునరావాస కేంద్రం",
+      "ta": "வெளியேற்ற மையம் / நிவாரண முகாம்",
+      "es": "centro de evacuación"
+    },
+    "emergency rations": {
+      "kn": "ತುರ್ತು ಆಹಾರ ಪಡಿತರ",
+      "hi": "आपातकालीन खाद्य राशन",
+      "te": "అత్యవసర ఆహార రేషన్",
+      "ta": "அவசர உணவுப் பங்கீடுகள்",
+      "es": "raciones de comida de emergencia"
+    },
+    "first aid post": {
+      "kn": "ಪ್ರಥಮ ಚಿಕಿತ್ಸಾ ಕೇಂದ್ರ",
+      "hi": "प्राथमिक चिकित्सा केंद्र",
+      "te": "ప్రథమ చికిత్స కేంద్రం",
+      "ta": "முதலுதவி மையம்",
+      "es": "puesto de primeros auxilios"
+    },
+    "flash flood": {
+      "kn": "ಆಕಸ್ಮಿಕ ಹಠಾತ್ ಪ್ರವಾಹ",
+      "hi": "अचानक आई बाढ़",
+      "te": "ఆకస్మిక వరద",
+      "ta": "திடீர் வெள்ளம்",
+      "es": "inundación repentina"
+    }
+  }
+}
+

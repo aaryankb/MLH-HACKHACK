@@ -1,0 +1,59 @@
+{
+  "name": "glossary-lookup",
+  "version": "1.0.0",
+  "description": "Context-aware domain glossary lookup skill that extracts and provides verified terminology translations for specialized settings (medical, emergency/disaster relief, legal). Adheres to the Agent Skills open standard.",
+  "author": "MOSS Hack Day Team",
+  "license": "MIT",
+  "tags": [
+    "translation",
+    "glossary",
+    "agent-skill",
+    "context-aware",
+    "gemma4"
+  ],
+  "input": {
+    "type": "object",
+    "properties": {
+      "context": {
+        "type": "string",
+        "description": "User-specified scenario or domain, e.g., 'Emergency medical diagnosis' or 'Disaster relief rations distribution'."
+      },
+      "source_text": {
+        "type": "string",
+        "description": "The raw input speech/text from the speaker."
+      },
+      "source_language": {
+        "type": "string",
+        "description": "Source language code, e.g., 'en'."
+      },
+      "target_language": {
+        "type": "string",
+        "description": "Target language code or name, e.g., 'kn' (Kannada), 'hi' (Hindi), 'te' (Telugu), 'ta' (Tamil), 'es' (Spanish)."
+      }
+    },
+    "required": ["source_text", "target_language"]
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "matched_domain": {
+        "type": "string",
+        "description": "Identified domain (medical, disaster_relief, legal, or general)."
+      },
+      "glossary_terms": {
+        "type": "object",
+        "description": "Key-value dictionary mapping specialized source terms to verified target translations.",
+        "additionalProperties": {
+          "type": "string"
+        }
+      },
+      "system_instruction_prompt": {
+        "type": "string",
+        "description": "Formatted domain instructions to be injected into the LLM system prompt."
+      }
+    },
+    "required": ["matched_domain", "glossary_terms", "system_instruction_prompt"]
+  },
+  "entrypoint": "GlossaryLookupSkill"
+}
+

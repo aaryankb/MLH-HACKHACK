@@ -1,0 +1,182 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.moss.hybridtranslator"
+4    android:versionCode="1"
+5    android:versionName="1.0.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="26"
+9        android:targetSdkVersion="35" />
+10
+11    <uses-permission android:name="android.permission.INTERNET" />
+11-->/home/aditya/Projects/MLH-HACKHACK/app/src/main/AndroidManifest.xml:4:5-67
+11-->/home/aditya/Projects/MLH-HACKHACK/app/src/main/AndroidManifest.xml:4:22-64
+12    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+12-->/home/aditya/Projects/MLH-HACKHACK/app/src/main/AndroidManifest.xml:5:5-71
+12-->/home/aditya/Projects/MLH-HACKHACK/app/src/main/AndroidManifest.xml:5:22-68
+13    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+13-->/home/aditya/Projects/MLH-HACKHACK/app/src/main/AndroidManifest.xml:6:5-79
+13-->/home/aditya/Projects/MLH-HACKHACK/app/src/main/AndroidManifest.xml:6:22-76
+14
+15    <permission
+15-->[androidx.core:core:1.15.0] /home/aditya/.gradle/caches/8.11.1/transforms/47e0e5e1e130e3585b1450c6a7eec603/transformed/core-1.15.0/AndroidManifest.xml:22:5-24:47
+16        android:name="com.moss.hybridtranslator.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+16-->[androidx.core:core:1.15.0] /home/aditya/.gradle/caches/8.11.1/transforms/47e0e5e1e130e3585b1450c6a7eec603/transformed/core-1.15.0/AndroidManifest.xml:23:9-81
+17        android:protectionLevel="signature" />
+17-->[androidx.core:core:1.15.0] /home/aditya/.gradle/caches/8.11.1/transforms/47e0e5e1e130e3585b1450c6a7eec603/transformed/core-1.15.0/AndroidManifest.xml:24:9-44
+18
+19    <uses-permission android:name="com.moss.hybridtranslator.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+19-->[androidx.core:core:1.15.0] /home/aditya/.gradle/caches/8.11.1/transforms/47e0e5e1e130e3585b1450c6a7eec603/transformed/core-1.15.0/AndroidManifest.xml:26:5-97
+19-->[androidx.core:core:1.15.0] /home/aditya/.gradle/caches/8.11.1/transforms/47e0e5e1e130e3585b1450c6a7eec603/transformed/core-1.15.0/AndroidManifest.xml:26:22-94
+20
+21    <application
+21-->/home/aditya/Projects/MLH-HACKHACK/app/src/main/AndroidManifest.xml:8:5-25:19
+22        android:allowBackup="true"
+22-->/home/aditya/Projects/MLH-HACKHACK/app/src/main/AndroidManifest.xml:9:9-35
+23        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+23-->[androidx.core:core:1.15.0] /home/aditya/.gradle/caches/8.11.1/transforms/47e0e5e1e130e3585b1450c6a7eec603/transformed/core-1.15.0/AndroidManifest.xml:28:18-86
+24        android:debuggable="true"
+25        android:extractNativeLibs="false"
+26        android:icon="@android:drawable/sym_def_app_icon"
+26-->/home/aditya/Projects/MLH-HACKHACK/app/src/main/AndroidManifest.xml:10:9-58
+27        android:label="Hybrid Translator"
+27-->/home/aditya/Projects/MLH-HACKHACK/app/src/main/AndroidManifest.xml:11:9-42
+28        android:roundIcon="@android:drawable/sym_def_app_icon"
+28-->/home/aditya/Projects/MLH-HACKHACK/app/src/main/AndroidManifest.xml:12:9-63
+29        android:supportsRtl="true"
+29-->/home/aditya/Projects/MLH-HACKHACK/app/src/main/AndroidManifest.xml:13:9-35
+30        android:theme="@android:style/Theme.Material.Light.NoActionBar" >
+30-->/home/aditya/Projects/MLH-HACKHACK/app/src/main/AndroidManifest.xml:14:9-72
+31        <activity
+31-->/home/aditya/Projects/MLH-HACKHACK/app/src/main/AndroidManifest.xml:15:9-24:20
+32            android:name="com.moss.hybridtranslator.MainActivity"
+32-->/home/aditya/Projects/MLH-HACKHACK/app/src/main/AndroidManifest.xml:16:13-41
+33            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+33-->/home/aditya/Projects/MLH-HACKHACK/app/src/main/AndroidManifest.xml:19:13-87
+34            android:exported="true"
+34-->/home/aditya/Projects/MLH-HACKHACK/app/src/main/AndroidManifest.xml:17:13-36
+35            android:windowSoftInputMode="adjustResize" >
+35-->/home/aditya/Projects/MLH-HACKHACK/app/src/main/AndroidManifest.xml:18:13-55
+36            <intent-filter>
+36-->/home/aditya/Projects/MLH-HACKHACK/app/src/main/AndroidManifest.xml:20:13-23:29
+37                <action android:name="android.intent.action.MAIN" />
+37-->/home/aditya/Projects/MLH-HACKHACK/app/src/main/AndroidManifest.xml:21:17-69
+37-->/home/aditya/Projects/MLH-HACKHACK/app/src/main/AndroidManifest.xml:21:25-66
+38
+39                <category android:name="android.intent.category.LAUNCHER" />
+39-->/home/aditya/Projects/MLH-HACKHACK/app/src/main/AndroidManifest.xml:22:17-77
+39-->/home/aditya/Projects/MLH-HACKHACK/app/src/main/AndroidManifest.xml:22:27-74
+40            </intent-filter>
+41        </activity>
+42
+43        <provider
+43-->[androidx.emoji2:emoji2:1.3.0] /home/aditya/.gradle/caches/8.11.1/transforms/640df6cdb5ccaa304b94ff57ba1e2b92/transformed/emoji2-1.3.0/AndroidManifest.xml:24:9-32:20
+44            android:name="androidx.startup.InitializationProvider"
+44-->[androidx.emoji2:emoji2:1.3.0] /home/aditya/.gradle/caches/8.11.1/transforms/640df6cdb5ccaa304b94ff57ba1e2b92/transformed/emoji2-1.3.0/AndroidManifest.xml:25:13-67
+45            android:authorities="com.moss.hybridtranslator.androidx-startup"
+45-->[androidx.emoji2:emoji2:1.3.0] /home/aditya/.gradle/caches/8.11.1/transforms/640df6cdb5ccaa304b94ff57ba1e2b92/transformed/emoji2-1.3.0/AndroidManifest.xml:26:13-68
+46            android:exported="false" >
+46-->[androidx.emoji2:emoji2:1.3.0] /home/aditya/.gradle/caches/8.11.1/transforms/640df6cdb5ccaa304b94ff57ba1e2b92/transformed/emoji2-1.3.0/AndroidManifest.xml:27:13-37
+47            <meta-data
+47-->[androidx.emoji2:emoji2:1.3.0] /home/aditya/.gradle/caches/8.11.1/transforms/640df6cdb5ccaa304b94ff57ba1e2b92/transformed/emoji2-1.3.0/AndroidManifest.xml:29:13-31:52
+48                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+48-->[androidx.emoji2:emoji2:1.3.0] /home/aditya/.gradle/caches/8.11.1/transforms/640df6cdb5ccaa304b94ff57ba1e2b92/transformed/emoji2-1.3.0/AndroidManifest.xml:30:17-75
+49                android:value="androidx.startup" />
+49-->[androidx.emoji2:emoji2:1.3.0] /home/aditya/.gradle/caches/8.11.1/transforms/640df6cdb5ccaa304b94ff57ba1e2b92/transformed/emoji2-1.3.0/AndroidManifest.xml:31:17-49
+50            <meta-data
+50-->[androidx.lifecycle:lifecycle-process:2.8.7] /home/aditya/.gradle/caches/8.11.1/transforms/0ce5f3cd8d878df3dcea9aa5b3679f5e/transformed/lifecycle-process-2.8.7/AndroidManifest.xml:29:13-31:52
+51                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+51-->[androidx.lifecycle:lifecycle-process:2.8.7] /home/aditya/.gradle/caches/8.11.1/transforms/0ce5f3cd8d878df3dcea9aa5b3679f5e/transformed/lifecycle-process-2.8.7/AndroidManifest.xml:30:17-78
+52                android:value="androidx.startup" />
+52-->[androidx.lifecycle:lifecycle-process:2.8.7] /home/aditya/.gradle/caches/8.11.1/transforms/0ce5f3cd8d878df3dcea9aa5b3679f5e/transformed/lifecycle-process-2.8.7/AndroidManifest.xml:31:17-49
+53            <meta-data
+53-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/aditya/.gradle/caches/8.11.1/transforms/c18726b7b548f5571a251ea7fa591e62/transformed/profileinstaller-1.3.1/AndroidManifest.xml:29:13-31:52
+54                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+54-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/aditya/.gradle/caches/8.11.1/transforms/c18726b7b548f5571a251ea7fa591e62/transformed/profileinstaller-1.3.1/AndroidManifest.xml:30:17-85
+55                android:value="androidx.startup" />
+55-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/aditya/.gradle/caches/8.11.1/transforms/c18726b7b548f5571a251ea7fa591e62/transformed/profileinstaller-1.3.1/AndroidManifest.xml:31:17-49
+56        </provider>
+57
+58        <activity
+58-->[androidx.compose.ui:ui-test-manifest:1.7.5] /home/aditya/.gradle/caches/8.11.1/transforms/2dcd6c7f94c2e226b803ec57c613c902/transformed/ui-test-manifest-1.7.5/AndroidManifest.xml:23:9-25:39
+59            android:name="androidx.activity.ComponentActivity"
+59-->[androidx.compose.ui:ui-test-manifest:1.7.5] /home/aditya/.gradle/caches/8.11.1/transforms/2dcd6c7f94c2e226b803ec57c613c902/transformed/ui-test-manifest-1.7.5/AndroidManifest.xml:24:13-63
+60            android:exported="true" />
+60-->[androidx.compose.ui:ui-test-manifest:1.7.5] /home/aditya/.gradle/caches/8.11.1/transforms/2dcd6c7f94c2e226b803ec57c613c902/transformed/ui-test-manifest-1.7.5/AndroidManifest.xml:25:13-36
+61        <activity
+61-->[androidx.compose.ui:ui-tooling-android:1.7.5] /home/aditya/.gradle/caches/8.11.1/transforms/48d27bfcfbe0a246acc35d1b37cd3f79/transformed/ui-tooling-release/AndroidManifest.xml:23:9-25:39
+62            android:name="androidx.compose.ui.tooling.PreviewActivity"
+62-->[androidx.compose.ui:ui-tooling-android:1.7.5] /home/aditya/.gradle/caches/8.11.1/transforms/48d27bfcfbe0a246acc35d1b37cd3f79/transformed/ui-tooling-release/AndroidManifest.xml:24:13-71
+63            android:exported="true" />
+63-->[androidx.compose.ui:ui-tooling-android:1.7.5] /home/aditya/.gradle/caches/8.11.1/transforms/48d27bfcfbe0a246acc35d1b37cd3f79/transformed/ui-tooling-release/AndroidManifest.xml:25:13-36
+64
+65        <receiver
+65-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/aditya/.gradle/caches/8.11.1/transforms/c18726b7b548f5571a251ea7fa591e62/transformed/profileinstaller-1.3.1/AndroidManifest.xml:34:9-52:20
+66            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+66-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/aditya/.gradle/caches/8.11.1/transforms/c18726b7b548f5571a251ea7fa591e62/transformed/profileinstaller-1.3.1/AndroidManifest.xml:35:13-76
+67            android:directBootAware="false"
+67-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/aditya/.gradle/caches/8.11.1/transforms/c18726b7b548f5571a251ea7fa591e62/transformed/profileinstaller-1.3.1/AndroidManifest.xml:36:13-44
+68            android:enabled="true"
+68-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/aditya/.gradle/caches/8.11.1/transforms/c18726b7b548f5571a251ea7fa591e62/transformed/profileinstaller-1.3.1/AndroidManifest.xml:37:13-35
+69            android:exported="true"
+69-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/aditya/.gradle/caches/8.11.1/transforms/c18726b7b548f5571a251ea7fa591e62/transformed/profileinstaller-1.3.1/AndroidManifest.xml:38:13-36
+70            android:permission="android.permission.DUMP" >
+70-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/aditya/.gradle/caches/8.11.1/transforms/c18726b7b548f5571a251ea7fa591e62/transformed/profileinstaller-1.3.1/AndroidManifest.xml:39:13-57
+71            <intent-filter>
+71-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/aditya/.gradle/caches/8.11.1/transforms/c18726b7b548f5571a251ea7fa591e62/transformed/profileinstaller-1.3.1/AndroidManifest.xml:40:13-42:29
+72                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+72-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/aditya/.gradle/caches/8.11.1/transforms/c18726b7b548f5571a251ea7fa591e62/transformed/profileinstaller-1.3.1/AndroidManifest.xml:41:17-91
+72-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/aditya/.gradle/caches/8.11.1/transforms/c18726b7b548f5571a251ea7fa591e62/transformed/profileinstaller-1.3.1/AndroidManifest.xml:41:25-88
+73            </intent-filter>
+74            <intent-filter>
+74-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/aditya/.gradle/caches/8.11.1/transforms/c18726b7b548f5571a251ea7fa591e62/transformed/profileinstaller-1.3.1/AndroidManifest.xml:43:13-45:29
+75                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+75-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/aditya/.gradle/caches/8.11.1/transforms/c18726b7b548f5571a251ea7fa591e62/transformed/profileinstaller-1.3.1/AndroidManifest.xml:44:17-85
+75-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/aditya/.gradle/caches/8.11.1/transforms/c18726b7b548f5571a251ea7fa591e62/transformed/profileinstaller-1.3.1/AndroidManifest.xml:44:25-82
+76            </intent-filter>
+77            <intent-filter>
+77-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/aditya/.gradle/caches/8.11.1/transforms/c18726b7b548f5571a251ea7fa591e62/transformed/profileinstaller-1.3.1/AndroidManifest.xml:46:13-48:29
+78                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+78-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/aditya/.gradle/caches/8.11.1/transforms/c18726b7b548f5571a251ea7fa591e62/transformed/profileinstaller-1.3.1/AndroidManifest.xml:47:17-88
+78-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/aditya/.gradle/caches/8.11.1/transforms/c18726b7b548f5571a251ea7fa591e62/transformed/profileinstaller-1.3.1/AndroidManifest.xml:47:25-85
+79            </intent-filter>
+80            <intent-filter>
+80-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/aditya/.gradle/caches/8.11.1/transforms/c18726b7b548f5571a251ea7fa591e62/transformed/profileinstaller-1.3.1/AndroidManifest.xml:49:13-51:29
+81                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+81-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/aditya/.gradle/caches/8.11.1/transforms/c18726b7b548f5571a251ea7fa591e62/transformed/profileinstaller-1.3.1/AndroidManifest.xml:50:17-95
+81-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/aditya/.gradle/caches/8.11.1/transforms/c18726b7b548f5571a251ea7fa591e62/transformed/profileinstaller-1.3.1/AndroidManifest.xml:50:25-92
+82            </intent-filter>
+83        </receiver>
+84
+85        <service
+85-->[com.google.android.datatransport:transport-backend-cct:3.1.0] /home/aditya/.gradle/caches/8.11.1/transforms/ced171feba7328c6632beae211678999/transformed/transport-backend-cct-3.1.0/AndroidManifest.xml:29:9-35:19
+86            android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery"
+86-->[com.google.android.datatransport:transport-backend-cct:3.1.0] /home/aditya/.gradle/caches/8.11.1/transforms/ced171feba7328c6632beae211678999/transformed/transport-backend-cct-3.1.0/AndroidManifest.xml:30:13-103
+87            android:exported="false" >
+87-->[com.google.android.datatransport:transport-backend-cct:3.1.0] /home/aditya/.gradle/caches/8.11.1/transforms/ced171feba7328c6632beae211678999/transformed/transport-backend-cct-3.1.0/AndroidManifest.xml:31:13-37
+88            <meta-data
+88-->[com.google.android.datatransport:transport-backend-cct:3.1.0] /home/aditya/.gradle/caches/8.11.1/transforms/ced171feba7328c6632beae211678999/transformed/transport-backend-cct-3.1.0/AndroidManifest.xml:32:13-34:39
+89                android:name="backend:com.google.android.datatransport.cct.CctBackendFactory"
+89-->[com.google.android.datatransport:transport-backend-cct:3.1.0] /home/aditya/.gradle/caches/8.11.1/transforms/ced171feba7328c6632beae211678999/transformed/transport-backend-cct-3.1.0/AndroidManifest.xml:33:17-94
+90                android:value="cct" />
+90-->[com.google.android.datatransport:transport-backend-cct:3.1.0] /home/aditya/.gradle/caches/8.11.1/transforms/ced171feba7328c6632beae211678999/transformed/transport-backend-cct-3.1.0/AndroidManifest.xml:34:17-36
+91        </service>
+92        <service
+92-->[com.google.android.datatransport:transport-runtime:3.1.0] /home/aditya/.gradle/caches/8.11.1/transforms/f8d28db391e13d2e1ab32b7d11df0db0/transformed/transport-runtime-3.1.0/AndroidManifest.xml:26:9-30:19
+93            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService"
+93-->[com.google.android.datatransport:transport-runtime:3.1.0] /home/aditya/.gradle/caches/8.11.1/transforms/f8d28db391e13d2e1ab32b7d11df0db0/transformed/transport-runtime-3.1.0/AndroidManifest.xml:27:13-117
+94            android:exported="false"
+94-->[com.google.android.datatransport:transport-runtime:3.1.0] /home/aditya/.gradle/caches/8.11.1/transforms/f8d28db391e13d2e1ab32b7d11df0db0/transformed/transport-runtime-3.1.0/AndroidManifest.xml:28:13-37
+95            android:permission="android.permission.BIND_JOB_SERVICE" >
+95-->[com.google.android.datatransport:transport-runtime:3.1.0] /home/aditya/.gradle/caches/8.11.1/transforms/f8d28db391e13d2e1ab32b7d11df0db0/transformed/transport-runtime-3.1.0/AndroidManifest.xml:29:13-69
+96        </service>
+97
+98        <receiver
+98-->[com.google.android.datatransport:transport-runtime:3.1.0] /home/aditya/.gradle/caches/8.11.1/transforms/f8d28db391e13d2e1ab32b7d11df0db0/transformed/transport-runtime-3.1.0/AndroidManifest.xml:32:9-34:40
+99            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiver"
+99-->[com.google.android.datatransport:transport-runtime:3.1.0] /home/aditya/.gradle/caches/8.11.1/transforms/f8d28db391e13d2e1ab32b7d11df0db0/transformed/transport-runtime-3.1.0/AndroidManifest.xml:33:13-132
+100            android:exported="false" />
+100-->[com.google.android.datatransport:transport-runtime:3.1.0] /home/aditya/.gradle/caches/8.11.1/transforms/f8d28db391e13d2e1ab32b7d11df0db0/transformed/transport-runtime-3.1.0/AndroidManifest.xml:34:13-37
+101    </application>
+102
+103</manifest>
