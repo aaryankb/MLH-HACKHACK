@@ -8,23 +8,7 @@
 > 1. **Best Open-Source AI Project**  
 > 2. **Best Use of Gemma 4**  
 
----
 
-## 📋 Rulebook README Checklist Verification
-
-| Checklist Item (Page 6 of Student Rulebook) | Status | Details & Location in Repo |
-|---|:---:|---|
-| **What the project does and how it works** | ✅ Included | [Section 1 & 2](#1-what-the-project-does--how-it-works) |
-| **Team members** | ✅ Included | [Section 3](#3-team-members) (Aditya Trivedi & Aaryan Kumar B) |
-| **Open-source license file** | ✅ Included | [Section 4](#4-open-source-license) ([LICENSE](LICENSE) - MIT License) |
-| **Each open-source / open-weight model with license links** | ✅ Included | [Section 5](#5-open-weight-models--licenses) (Gemma 4 & Gemma 4 E2B) |
-| **Libraries, frameworks, APIs and datasets used** | ✅ Included | [Section 6](#6-libraries-frameworks-apis-and-datasets) |
-| **AI coding tools used and which parts they produced** | ✅ Included | [Section 7](#7-mandatory-ai-coding-tools-disclosure) (Gemini, Antigravity, VS Code Autocomplete) |
-| **How to run it** | ✅ Included | [Section 8](#8-how-to-build--run-step-by-step) |
-| **For Best Use of Gemma 4: model name & Gemini API integration** | ✅ Included | [Section 9](#9-challenge-alignment-1-best-use-of-gemma-4) (`gemma-4-26b-a4b-it` via Gemini API) |
-| **For Best Open-Source AI: Agent Skills standard & Model Harness** | ✅ Included | [Section 10](#10-challenge-alignment-2-best-open-source-ai-project) ([`skill.json`](agent-skills/glossary-lookup/skill.json) & [`ModelHarness.kt`](app/src/main/java/com/moss/hybridtranslator/harness/ModelHarness.kt)) |
-
----
 
 ## 1. What the Project Does & How It Works
 
@@ -35,7 +19,7 @@ In disaster relief camps, emergency clinics, and remote crisis zones, critical c
 3. **Cluttered & Unnatural UI:** Most translators require awkward device-passing or upside-down reading, creating friction during high-stress interactions.
 
 ### The Solution: Hybrid AI Translation
-**Hybrid AI Translation App** is a native Android application designed with an **Apple Translate minimalist aesthetic** that provides zero-downtime translation across both cloud and offline environments:
+**Hybrid AI Translation App** is a native Android application that provides zero-downtime translation across both cloud and offline environments:
 
 - **Apple-Inspired Clutter-Free UI:** Clean, upright, single-direction interface. Features source input, instant translation, audio playback, language swap (`⇄`), and confidence-scored alternative candidates.
 - **Physical Edge / Cloud Toggle:** An intuitive hardware-style toggle switch allowing instant swapping between **`⚡ Local Edge Model (Gemma 4 E2B)`** and **`☁️ Cloud API (Gemma 4 Online)`**.
@@ -52,7 +36,7 @@ In disaster relief camps, emergency clinics, and remote crisis zones, critical c
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│               Native Jetpack Compose UI (Apple Translate Style)         │
+│               Native Jetpack Compose UI       │
 │  - Context Setter Pill (Agent Skill Active)                             │
 │  - Physical Toggle Switch: [⚡ Local Edge] <-----> [☁️ Cloud API]         │
 │  - Source Input Card (Speech-to-Text / Audio RMS Meter)                 │
