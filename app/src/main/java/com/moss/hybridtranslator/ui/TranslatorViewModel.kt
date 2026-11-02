@@ -9,8 +9,9 @@ import com.moss.hybridtranslator.data.model.TranslationTurn
 import com.moss.hybridtranslator.harness.GlossaryLookupSkill
 import com.moss.hybridtranslator.harness.ModelHarness
 import com.moss.hybridtranslator.services.GeminiGemmaService
-import com.moss.hybridtranslator.services.MediaPipeGemmaService
+import com.moss.hybridtranslator.services.LocalGemmaService
 import com.moss.hybridtranslator.services.SpeechService
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -34,10 +35,10 @@ class TranslatorViewModel(application: Application) : AndroidViewModel(applicati
 
     private val glossarySkill = GlossaryLookupSkill(application)
     val geminiService = GeminiGemmaService()
-    val mediaPipeService = MediaPipeGemmaService(application)
+    val localService = LocalGemmaService(application)
     val speechService = SpeechService(application)
 
-    private val harness = ModelHarness(glossarySkill, geminiService, mediaPipeService)
+    private val harness = ModelHarness(glossarySkill, geminiService, localService)
 
     private val _userALanguage = MutableStateFlow(SUPPORTED_LANGUAGES[0]) // English
     val userALanguage: StateFlow<LanguageOption> = _userALanguage.asStateFlow()
@@ -57,15 +58,10 @@ class TranslatorViewModel(application: Application) : AndroidViewModel(applicati
     private val _currentSourceText = MutableStateFlow("The patient is experiencing severe anaphylaxis.")
     val currentSourceText: StateFlow<String> = _currentSourceText.asStateFlow()
 
-    private val _currentTranslatedText = MutableStateFlow("ರೋಗಿಯು ತೀವ್ರ ಅಲರ್ಜಿ ಪ್ರತಿಕ್ರಿಯೆ (ಅನಾಫಿಲ್ಯಾಕ್ಸಿಸ್) ಅನುಭವಿಸುತ್ತಿದ್ದಾರೆ.")
+    private val _currentTranslatedText = MutableStateFlow("")
     val currentTranslatedText: StateFlow<String> = _currentTranslatedText.asStateFlow()
 
-    private val _currentAlternatives = MutableStateFlow<List<com.moss.hybridtranslator.data.model.TranslationCandidate>>(
-        listOf(
-            com.moss.hybridtranslator.data.model.TranslationCandidate("ರೋಗಿಗೆ ತಕ್ಷಣದ ತುರ್ತು ಚಿಕಿತ್ಸೆ ಅಗತ್ಯವಿದೆ", "Formal", 94),
-            com.moss.hybridtranslator.data.model.TranslationCandidate("ರೋಗಿಯು ತೀವ್ರ ಅಲರ್ಜಿಯನ್ನು ಹೊಂದಿದ್ದಾನೆ", "Literal", 76)
-        )
-    )
+    private val _currentAlternatives = MutableStateFlow<List<com.moss.hybridtranslator.data.model.TranslationCandidate>>(emptyList())
     val currentAlternatives: StateFlow<List<com.moss.hybridtranslator.data.model.TranslationCandidate>> = _currentAlternatives.asStateFlow()
 
     private val _turns = MutableStateFlow<List<TranslationTurn>>(emptyList())
@@ -73,6 +69,9 @@ class TranslatorViewModel(application: Application) : AndroidViewModel(applicati
 
     private val _isTranslating = MutableStateFlow(false)
     val isTranslating: StateFlow<Boolean> = _isTranslating.asStateFlow()
+
+    private val _translationError = MutableStateFlow<String?>(null)
+    val translationError: StateFlow<String?> = _translationError.asStateFlow()
 
     private val _lastExecutionResult = MutableStateFlow<HarnessExecutionResult?>(null)
     val lastExecutionResult: StateFlow<HarnessExecutionResult?> = _lastExecutionResult.asStateFlow()
@@ -92,20 +91,6 @@ class TranslatorViewModel(application: Application) : AndroidViewModel(applicati
         if (savedKey.isNotBlank()) {
             geminiService.updateApiKey(savedKey, savedModel)
         }
-
-        // Pre-populate with a demonstrative introductory turn
-        viewModelScope.launch {
-            val introTurn = TranslationTurn(
-                id = UUID.randomUUID().toString(),
-                speaker = Speaker.USER_A,
-                sourceLanguage = "en",
-                targetLanguage = "kn",
-                sourceText = "The patient is experiencing severe anaphylaxis.",
-                translatedText = "ರೋಗಿಯು ತೀವ್ರ ಅಲರ್ಜಿ ಪ್ರತಿಕ್ರಿಯೆ (ಅನಾಫಿಲ್ಯಾಕ್ಸಿಸ್) ಅನುಭವಿಸುತ್ತಿದ್ದಾರೆ.",
-                isOffline = false
-            )
-            _turns.value = listOf(introTurn)
-        }
     }
 
     fun setUserALanguage(language: LanguageOption) {
@@ -121,11 +106,14 @@ class TranslatorViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun toggleOfflineMode() {
-        _isOfflineMode.value = !_isOfflineMode.value
+        setOfflineMode(!_isOfflineMode.value)
     }
 
     fun setOfflineMode(offline: Boolean) {
         _isOfflineMode.value = offline
+        if (offline && !localService.isModelReady.value) {
+            showDownloadDialog.value = true
+        }
     }
 
     fun toggleTurboMode() {
@@ -172,38 +160,46 @@ class TranslatorViewModel(application: Application) : AndroidViewModel(applicati
 
         viewModelScope.launch {
             _isTranslating.value = true
+            _translationError.value = null
             val srcLang = _userALanguage.value
             val tgtLang = _userBLanguage.value
 
-            val result = harness.translate(
-                userContext = _contextSetter.value,
-                sourceText = text,
-                targetLanguageName = tgtLang.name,
-                targetLanguageCode = tgtLang.code,
-                isOfflineMode = _isOfflineMode.value,
-                history = _turns.value
-            )
+            try {
+                val result = harness.translate(
+                    userContext = _contextSetter.value,
+                    sourceText = text,
+                    targetLanguageName = tgtLang.name,
+                    targetLanguageCode = tgtLang.code,
+                    isOfflineMode = _isOfflineMode.value,
+                    history = _turns.value
+                )
 
-            _lastExecutionResult.value = result
-            _currentTranslatedText.value = result.translatedText
-            _currentAlternatives.value = result.alternatives
+                _lastExecutionResult.value = result
+                _currentTranslatedText.value = result.translatedText
+                _currentAlternatives.value = result.alternatives
 
-            val newTurn = TranslationTurn(
-                id = UUID.randomUUID().toString(),
-                speaker = Speaker.USER_A,
-                sourceLanguage = srcLang.code,
-                targetLanguage = tgtLang.code,
-                sourceText = text,
-                translatedText = result.translatedText,
-                alternatives = result.alternatives,
-                isOffline = result.isOffline
-            )
+                val newTurn = TranslationTurn(
+                    id = UUID.randomUUID().toString(),
+                    speaker = Speaker.USER_A,
+                    sourceLanguage = srcLang.code,
+                    targetLanguage = tgtLang.code,
+                    sourceText = text,
+                    translatedText = result.translatedText,
+                    alternatives = result.alternatives,
+                    isOffline = result.isOffline
+                )
 
-            _turns.value = _turns.value + newTurn
-            _isTranslating.value = false
+                _turns.value = _turns.value + newTurn
 
-            if (autoSpeak) {
-                speechService.speak(result.translatedText, tgtLang.code)
+                if (autoSpeak) {
+                    speechService.speak(result.translatedText, tgtLang.code)
+                }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (t: Throwable) {
+                _translationError.value = t.message ?: t.javaClass.simpleName
+            } finally {
+                _isTranslating.value = false
             }
         }
     }
@@ -224,6 +220,7 @@ class TranslatorViewModel(application: Application) : AndroidViewModel(applicati
 
         viewModelScope.launch {
             _isTranslating.value = true
+            _translationError.value = null
 
             val (srcLang, tgtLang) = if (speaker == Speaker.USER_A) {
                 userALanguage.value to userBLanguage.value
@@ -231,33 +228,40 @@ class TranslatorViewModel(application: Application) : AndroidViewModel(applicati
                 userBLanguage.value to userALanguage.value
             }
 
-            val result = harness.translate(
-                userContext = _contextSetter.value,
-                sourceText = sourceText,
-                targetLanguageName = tgtLang.name,
-                targetLanguageCode = tgtLang.code,
-                isOfflineMode = _isOfflineMode.value,
-                history = _turns.value
-            )
+            try {
+                val result = harness.translate(
+                    userContext = _contextSetter.value,
+                    sourceText = sourceText,
+                    targetLanguageName = tgtLang.name,
+                    targetLanguageCode = tgtLang.code,
+                    isOfflineMode = _isOfflineMode.value,
+                    history = _turns.value
+                )
 
-            _lastExecutionResult.value = result
+                _lastExecutionResult.value = result
 
-            val newTurn = TranslationTurn(
-                id = UUID.randomUUID().toString(),
-                speaker = speaker,
-                sourceLanguage = srcLang.code,
-                targetLanguage = tgtLang.code,
-                sourceText = sourceText,
-                translatedText = result.translatedText,
-                alternatives = result.alternatives,
-                isOffline = result.isOffline
-            )
+                val newTurn = TranslationTurn(
+                    id = UUID.randomUUID().toString(),
+                    speaker = speaker,
+                    sourceLanguage = srcLang.code,
+                    targetLanguage = tgtLang.code,
+                    sourceText = sourceText,
+                    translatedText = result.translatedText,
+                    alternatives = result.alternatives,
+                    isOffline = result.isOffline
+                )
 
-            _turns.value = _turns.value + newTurn
-            _isTranslating.value = false
+                _turns.value = _turns.value + newTurn
 
-            // Automatically speak the translated text aloud for the listener
-            speechService.speak(result.translatedText, tgtLang.code)
+                // Automatically speak the translated text aloud for the listener
+                speechService.speak(result.translatedText, tgtLang.code)
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (t: Throwable) {
+                _translationError.value = t.message ?: t.javaClass.simpleName
+            } finally {
+                _isTranslating.value = false
+            }
         }
     }
 
@@ -286,6 +290,7 @@ class TranslatorViewModel(application: Application) : AndroidViewModel(applicati
 
     override fun onCleared() {
         super.onCleared()
+        localService.close()
         speechService.destroy()
     }
 }

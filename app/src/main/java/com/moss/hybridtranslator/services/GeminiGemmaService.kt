@@ -37,7 +37,7 @@ class GeminiGemmaService(
                 val config = generationConfig {
                     temperature = 0.1f
                     topK = 20
-                    maxOutputTokens = 256
+                    maxOutputTokens = 640
                 }
                 this.generativeModel = GenerativeModel(
                     modelName = this.modelName,
@@ -93,7 +93,7 @@ class GeminiGemmaService(
                 val config = generationConfig {
                     temperature = 0.1f
                     topK = 20
-                    maxOutputTokens = 256
+                    maxOutputTokens = 640
                 }
 
                 val model = GenerativeModel(
@@ -102,7 +102,14 @@ class GeminiGemmaService(
                     generationConfig = config
                 )
 
-                val response = model.generateContent(systemPrompt)
+                val fullPrompt = buildString {
+                    append(systemPrompt)
+                    if (userText.isNotBlank()) {
+                        append("\n\nText to Translate:\n")
+                        append(userText)
+                    }
+                }
+                val response = model.generateContent(fullPrompt)
 
                 // For thinking models (like Gemma 4), extract the final text part
                 val candidatePart = response.candidates.firstOrNull()?.content?.parts

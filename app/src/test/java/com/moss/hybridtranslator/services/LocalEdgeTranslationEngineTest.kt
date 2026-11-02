@@ -74,5 +74,31 @@ class LocalEdgeTranslationEngineTest {
         val esResult = LocalEdgeTranslationEngine.translate("hello man", "es")
         assertTrue("Spanish output must contain Hola", esResult.primary.contains("Hola", ignoreCase = true))
     }
+
+    @Test
+    fun testShortPhrasesOnlyMatchWholeWords() {
+        // "hi" used to match inside "this", producing a greeting for an
+        // unrelated sentence. The phrase matcher must require word boundaries.
+        val result = LocalEdgeTranslationEngine.translate(
+            sourceText = "this is a test",
+            targetLanguageCode = "hi"
+        )
+        assertFalse(
+            "A sentence containing 'this' must not be treated as the greeting 'hi'",
+            result.primary.contains("नमस्ते")
+        )
+    }
+
+    @Test
+    fun testProfessionalContextAndGlossaryAreUsedForMedicalFallback() {
+        val result = LocalEdgeTranslationEngine.translate(
+            sourceText = "The patient has anaphylaxis",
+            targetLanguageCode = "hi",
+            userContext = "Emergency medical diagnosis",
+            glossary = mapOf("anaphylaxis" to "एनाफिलेक्सिस")
+        )
+
+        assertTrue("Medical glossary term should be used", result.primary.contains("एनाफिलेक्सिस"))
+    }
 }
 

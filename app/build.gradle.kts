@@ -17,6 +17,11 @@ android {
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // LiteRT-LM ships 64-bit native libraries only.
+        ndk {
+            abiFilters += listOf("arm64-v8a", "x86_64")
+        }
     }
 
     buildTypes {
@@ -32,12 +37,15 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
     }
 }
 
@@ -53,9 +61,9 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.icons.extended)
 
-    // AI Engines: Gemini Cloud + MediaPipe Edge
+    // AI Engines: Gemini Cloud + LiteRT-LM on-device
     implementation(libs.google.generativeai)
-    implementation(libs.google.mediapipe.genai)
+    implementation(libs.google.litertlm)
 
     // Kotlinx Coroutines & Serialization
     implementation(libs.kotlinx.coroutines.android)
@@ -71,4 +79,3 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
-

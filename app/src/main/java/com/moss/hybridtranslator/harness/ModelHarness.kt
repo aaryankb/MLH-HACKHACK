@@ -4,7 +4,7 @@ import com.moss.hybridtranslator.data.model.HarnessExecutionResult
 import com.moss.hybridtranslator.data.model.TranslationCandidate
 import com.moss.hybridtranslator.data.model.TranslationTurn
 import com.moss.hybridtranslator.services.GeminiGemmaService
-import com.moss.hybridtranslator.services.MediaPipeGemmaService
+import com.moss.hybridtranslator.services.LocalTranslator
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -19,12 +19,12 @@ private data class HarnessJsonResponse(
 /**
  * Custom Model Harness managing prompt generation, Agent Skill tool execution,
  * conversation memory, multi-candidate probability scoring, and hybrid routing
- * between Gemini Gemma 4 (Online) and MediaPipe Gemma 4 E2B (Offline Edge).
+ * between Gemini Gemma 4 (Online) and Gemma 4 E2B via LiteRT-LM (Offline Edge).
  */
 class ModelHarness(
     private val glossaryLookupSkill: GlossaryLookupSkill,
     private val geminiService: GeminiGemmaService,
-    private val mediaPipeService: MediaPipeGemmaService
+    private val localTranslator: LocalTranslator
 ) {
 
     private val json = Json {
@@ -59,8 +59,7 @@ class ModelHarness(
             targetLanguageCode = targetLanguageCode,
             userContext = userContext,
             skillOutput = skillOutput,
-            history = history,
-            sourceText = sourceText
+            history = history
         )
 
         // Phase 3: Hybrid Routing
@@ -68,14 +67,16 @@ class ModelHarness(
         val engineName: String
 
         if (isOfflineMode) {
-            engineName = "MediaPipe Gemma 4 E2B (Edge)"
-            rawResponse = mediaPipeService.generateTranslation(
+            val localResult = localTranslator.generateTranslation(
                 systemPrompt = systemPrompt,
                 userText = sourceText,
                 targetLanguage = targetLanguageName,
                 targetLanguageCode = targetLanguageCode,
+                userContext = userContext,
                 fallbackGlossary = skillOutput.glossaryTerms
             )
+            rawResponse = localResult.text
+            engineName = localResult.engineLabel
         } else {
             engineName = if (geminiService.isTurboMode) "Gemini Flash (Turbo ⚡)" else "Gemma 4 Cloud (Reasoning 🧠)"
             rawResponse = geminiService.generateTranslation(
@@ -112,10 +113,9 @@ class ModelHarness(
         targetLanguage: String,
         userContext: String,
         skillOutput: com.moss.hybridtranslator.data.model.SkillOutput,
-        history: List<TranslationTurn>,
-        sourceText: String
+        history: List<TranslationTurn>
     ): String {
-        return buildSystemPrompt(targetLanguage, "en", userContext, skillOutput, history, sourceText)
+        return buildSystemPrompt(targetLanguage, "en", userContext, skillOutput, history)
     }
 
     /**
@@ -126,8 +126,7 @@ class ModelHarness(
         targetLanguageCode: String,
         userContext: String,
         skillOutput: com.moss.hybridtranslator.data.model.SkillOutput,
-        history: List<TranslationTurn>,
-        sourceText: String
+        history: List<TranslationTurn>
     ): String {
         val contextStr = if (userContext.isNotBlank()) userContext else "General everyday conversation"
         val glossaryJson = if (skillOutput.glossaryTerms.isNotEmpty()) {
@@ -168,7 +167,7 @@ Domain Terminology (Provided by Glossary Agent Skill): $glossaryJson
 Previous Chat History:
 $historyWindow
 
-Text to Translate: $sourceText
+The text to translate is provided in the next user message. If it is already in $targetLanguage, return it unchanged.
 
 RESPONSE FORMAT (Respond ONLY with valid JSON):
 {
@@ -220,63 +219,10 @@ RESPONSE FORMAT (Respond ONLY with valid JSON):
             // JSON parsing failed, fallback to heuristic extraction
         }
 
-        // 2. Fallback heuristic parsing if LLM returned plain text or offline fallback
+        // 2. The model did not return JSON. Keep the plain text and do not
+        // invent fake alternatives or confidence scores.
         val cleaned = sanitizeOutput(trimmed)
-        val defaultCandidates = generateDefaultAlternatives(cleaned, sourceText, targetLanguageCode, contextStr)
-        return cleaned to defaultCandidates
-    }
-
-    /**
-     * Synthesizes smart candidates (Formal, Colloquial, Literal) when raw string fallback occurs.
-     */
-    private fun generateDefaultAlternatives(
-        primaryText: String,
-        sourceText: String,
-        targetLanguageCode: String,
-        contextStr: String
-    ): List<TranslationCandidate> {
-        val lowerSource = sourceText.lowercase().trim()
-        val isProfessional = contextStr.contains("medical", ignoreCase = true) ||
-                contextStr.contains("legal", ignoreCase = true) ||
-                contextStr.contains("professional", ignoreCase = true)
-
-        return when {
-            // Specific example from user: "hello man" -> Hindi "हैलो भाई"
-            lowerSource.contains("hello man") || lowerSource.contains("hey man") -> {
-                when (targetLanguageCode.lowercase()) {
-                    "hi" -> listOf(
-                        TranslationCandidate(text = "नमस्ते भाई", type = "Formal / Respectful", confidence = 92),
-                        TranslationCandidate(text = "नमस्ते आदमी", type = "Literal", confidence = 65)
-                    )
-                    "kn" -> listOf(
-                        TranslationCandidate(text = "ನಮಸ್ಕಾರ ಸ್ನೇಹಿತರೇ", type = "Formal", confidence = 90),
-                        TranslationCandidate(text = "ಹಲೋ ಮನುಷ್ಯ", type = "Literal", confidence = 60)
-                    )
-                    "te" -> listOf(
-                        TranslationCandidate(text = "నమస్కారం సోదరా", type = "Formal", confidence = 91),
-                        TranslationCandidate(text = "హలో మనిషి", type = "Literal", confidence = 62)
-                    )
-                    "ta" -> listOf(
-                        TranslationCandidate(text = "வணக்கம் நண்பரே", type = "Formal", confidence = 93),
-                        TranslationCandidate(text = "ஹலோ மனிதன்", type = "Literal", confidence = 61)
-                    )
-                    "es" -> listOf(
-                        TranslationCandidate(text = "Hola, amigo", type = "Colloquial", confidence = 94),
-                        TranslationCandidate(text = "Hola hombre", type = "Literal", confidence = 70)
-                    )
-                    else -> emptyList()
-                }
-            }
-            isProfessional -> {
-                listOf(
-                    TranslationCandidate(text = primaryText, type = "Formal (Recommended)", confidence = 96),
-                    TranslationCandidate(text = primaryText, type = "Standard Literal", confidence = 82)
-                )
-            }
-            else -> {
-                emptyList()
-            }
-        }
+        return cleaned to emptyList()
     }
 
     private fun sanitizeOutput(rawText: String): String {

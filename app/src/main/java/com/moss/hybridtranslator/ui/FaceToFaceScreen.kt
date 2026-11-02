@@ -55,6 +55,12 @@ fun FaceToFaceScreen(viewModel: TranslatorViewModel) {
     val isTurbo by viewModel.isTurboMode.collectAsState()
     val isTranslating by viewModel.isTranslating.collectAsState()
     val lastResult by viewModel.lastExecutionResult.collectAsState()
+    val translationError by viewModel.translationError.collectAsState()
+
+    val localReady by viewModel.localService.isModelReady.collectAsState()
+    val localLoading by viewModel.localService.isLoading.collectAsState()
+    val localDownloading by viewModel.localService.isDownloading.collectAsState()
+    val localEngineName by viewModel.localService.engineName.collectAsState()
 
     val sourceText by viewModel.currentSourceText.collectAsState()
     val translatedText by viewModel.currentTranslatedText.collectAsState()
@@ -130,10 +136,16 @@ fun FaceToFaceScreen(viewModel: TranslatorViewModel) {
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
-                                text = if (isOffline) "Offline: Gemma 4 E2B" else if (isTurbo) "Cloud: Turbo Flash (⚡ 1s)" else "Cloud: Gemma 4 (🧠 Deep)",
+                                text = when {
+                                    isOffline && localReady -> "Offline: Gemma 4 E2B"
+                                    isOffline && localLoading -> "Offline: loading model…"
+                                    isOffline -> "Offline: model not loaded"
+                                    isTurbo -> "Cloud: Turbo Flash (⚡ 1s)"
+                                    else -> "Cloud: Gemma 4 (🧠 Deep)"
+                                },
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = if (isOffline) AppleOrange else AppleBlue
+                                color = if (isOffline && !localReady) Color(0xFFFF453A) else if (isOffline) AppleGreen else AppleBlue
                             )
                         }
 
@@ -294,13 +306,20 @@ fun FaceToFaceScreen(viewModel: TranslatorViewModel) {
                     Spacer(modifier = Modifier.width(10.dp))
                     Column {
                         Text(
-                            text = if (isOffline) "Local Edge Model (Gemma 4 E2B)" else if (isTurbo) "Cloud API (Turbo Flash ⚡)" else "Cloud API (Gemma 4 Online)",
+                            text = if (isOffline) "Local Model (Gemma 4 E2B)" else if (isTurbo) "Cloud API (Turbo Flash ⚡)" else "Cloud API (Gemma 4 Online)",
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
                         Text(
-                            text = if (isOffline) "⚡ Ultra-fast • Zero network • Private" else if (isTurbo) "⚡ Sub-second response • Gemini Flash" else "☁️ Deep reasoning • Gemini API",
+                            text = when {
+                                !isOffline && isTurbo -> "⚡ Sub-second response • Gemini Flash"
+                                !isOffline -> "☁️ Deep reasoning • Gemini API"
+                                localReady -> "🔒 On-device · $localEngineName"
+                                localLoading -> "Loading the model into memory…"
+                                localDownloading -> "Downloading the 2.6 GB model…"
+                                else -> "Tap to download the on-device model"
+                            },
                             fontSize = 11.sp,
                             color = AppleSecondaryText
                         )
@@ -314,11 +333,67 @@ fun FaceToFaceScreen(viewModel: TranslatorViewModel) {
                     },
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = Color.White,
-                        checkedTrackColor = AppleOrange,
+                        checkedTrackColor = if (localReady) AppleGreen else AppleOrange,
                         uncheckedThumbColor = Color.White,
                         uncheckedTrackColor = AppleBlue
                     )
                 )
+            }
+
+            if (isOffline && !localReady) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color(0xFF3B2500))
+                        .clickable { viewModel.showDownloadDialog.value = true }
+                        .padding(horizontal = 12.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CloudDownload,
+                        contentDescription = null,
+                        tint = AppleOrange,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = when {
+                            localLoading -> "Loading Gemma 4 E2B…"
+                            localDownloading -> "Downloading Gemma 4 E2B…"
+                            else -> "Offline model not installed. Tap to download Gemma 4 E2B (2.6 GB)."
+                        },
+                        fontSize = 11.sp,
+                        color = AppleOrange,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+
+            if (translationError != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color(0xFF3B0A0A))
+                        .padding(horizontal = 12.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ErrorOutline,
+                        contentDescription = null,
+                        tint = Color(0xFFFF453A),
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = translationError.orEmpty(),
+                        fontSize = 11.sp,
+                        color = Color(0xFFFF453A)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -877,10 +952,10 @@ fun FaceToFaceScreen(viewModel: TranslatorViewModel) {
 
     if (showDownload) {
         ModelDownloadDialog(
-            mediaPipeService = viewModel.mediaPipeService,
+            localService = viewModel.localService,
             onSwitchToLocal = {
                 viewModel.setOfflineMode(true)
-                Toast.makeText(context, "Switched to Local Edge Model for fastest response", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Switched to on-device Gemma 4 E2B", Toast.LENGTH_SHORT).show()
             },
             onDismiss = { viewModel.showDownloadDialog.value = false }
         )

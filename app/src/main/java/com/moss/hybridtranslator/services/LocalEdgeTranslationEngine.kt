@@ -52,6 +52,29 @@ object LocalEdgeTranslationEngine {
         return TranslationResult(primary, alternatives)
     }
 
+    /**
+     * Finds the longest phrase that appears as a whole phrase inside [normalized].
+     * Word boundaries are required so short keys such as "hi" do not match
+     * inside words such as "this".
+     */
+    private fun findPhrase(
+        normalized: String,
+        phraseMap: Map<String, List<Triple<String, String, Int>>>
+    ): List<Triple<String, String, Int>>? {
+        phraseMap[normalized]?.let { return it }
+        return phraseMap.entries
+            .asSequence()
+            .filter { (phrase, _) ->
+                val pattern = Regex(
+                    "(?<![a-z0-9])${Regex.escape(phrase)}(?![a-z0-9])",
+                    RegexOption.IGNORE_CASE
+                )
+                pattern.containsMatchIn(normalized)
+            }
+            .maxByOrNull { it.key.length }
+            ?.value
+    }
+
     // =========================================================================
     // HINDI ENGINE (Devanagari Script)
     // =========================================================================
@@ -200,24 +223,7 @@ object LocalEdgeTranslationEngine {
                 )
             }
 
-            for ((key, result) in phraseMap) {
-                if (normalized.contains(key)) return result
-            }
-
-            var translatedWithGlossary = raw
-            var hasGlossary = false
-            glossary.forEach { (src, tgt) ->
-                if (translatedWithGlossary.contains(Regex("(?i)\\b$src\\b"))) {
-                    translatedWithGlossary = translatedWithGlossary.replace(Regex("(?i)\\b$src\\b"), tgt)
-                    hasGlossary = true
-                }
-            }
-            if (hasGlossary && isProfessional) {
-                return listOf(
-                    Triple(translatedWithGlossary, "Medical / Formal", 95),
-                    Triple(translatedWithGlossary, "Literal", 75)
-                )
-            }
+            findPhrase(normalized, phraseMap)?.let { return it }
 
             // SOV Syntax Assembly
             val composed = composeHindiSentence(normalized)
@@ -447,24 +453,7 @@ object LocalEdgeTranslationEngine {
                 )
             }
 
-            for ((key, result) in phraseMap) {
-                if (normalized.contains(key)) return result
-            }
-
-            var translatedWithGlossary = raw
-            var hasGlossary = false
-            glossary.forEach { (src, tgt) ->
-                if (translatedWithGlossary.contains(Regex("(?i)\\b$src\\b"))) {
-                    translatedWithGlossary = translatedWithGlossary.replace(Regex("(?i)\\b$src\\b"), tgt)
-                    hasGlossary = true
-                }
-            }
-            if (hasGlossary && isProfessional) {
-                return listOf(
-                    Triple(translatedWithGlossary, "Medical / Formal", 95),
-                    Triple(translatedWithGlossary, "Literal", 75)
-                )
-            }
+            findPhrase(normalized, phraseMap)?.let { return it }
 
             // SOV Kannada composition
             if (normalized.startsWith("where is") || normalized.startsWith("where are")) {
@@ -580,9 +569,7 @@ object LocalEdgeTranslationEngine {
                 )
             }
 
-            for ((key, result) in phraseMap) {
-                if (normalized.contains(key)) return result
-            }
+            findPhrase(normalized, phraseMap)?.let { return it }
 
             if (normalized.startsWith("where is") || normalized.startsWith("where are")) {
                 val target = normalized.removePrefix("where is").removePrefix("where are").trim().removePrefix("the").trim()
@@ -636,9 +623,7 @@ object LocalEdgeTranslationEngine {
                 )
             }
 
-            for ((key, result) in phraseMap) {
-                if (normalized.contains(key)) return result
-            }
+            findPhrase(normalized, phraseMap)?.let { return it }
 
             if (normalized.startsWith("where is") || normalized.startsWith("where are")) {
                 val target = normalized.removePrefix("where is").removePrefix("where are").trim().removePrefix("the").trim()
@@ -694,9 +679,7 @@ object LocalEdgeTranslationEngine {
                 )
             }
 
-            for ((key, result) in phraseMap) {
-                if (normalized.contains(key)) return result
-            }
+            findPhrase(normalized, phraseMap)?.let { return it }
 
             if (normalized.startsWith("where is") || normalized.startsWith("where are")) {
                 val target = normalized.removePrefix("where is").removePrefix("where are").trim().removePrefix("the").trim()
